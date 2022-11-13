@@ -2,7 +2,7 @@
 ## 1. Application Failure
 - check Service: Service의 Selector에 있는 labels이 현재 동작되는 Application(pod)의 labels와 같은지 확인
 - 다음과 같은 아키텍처 구조에서 직접 troubleshooting 해보기
-![default](./image/troublearchitecture.png)
+![default](./image/troublearchitecture.PNG)
 1. mysql-service
 ```
 $ kubectl describe svc mysql-service -n=beta
