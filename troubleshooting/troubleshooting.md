@@ -117,4 +117,58 @@ Volumes의 k8s-certs가 가지고 있는 HostPath 타입의 Path가 이상하다
 <br></br>
 ![default](./image/1116-10.PNG)
 모든 Pod가 문제없이 작동하는 것을 확인할 수 있다.
+<br></br>
+## 3. Worker Node Failure
+WorkerNode의 경우는 Broken된 해당 노드로 ssh해서 잘못된 부분을 찾는다.
+가장 대표적인 Worker Node의 잘못된 이유 중 하나인 kubelet이 문제가 없는지 살펴본다.
+(1)
+```
+$ root@node01 ~ ➜  systemctl status kubelet
+```
 
+![default](./image/1117-1.PNG)
+kubelet에 문제가 생긴 듯 하다. kubelet을 restart 해본다.
+
+```
+$ root@node01 ~ ➜  systemctl restart kubelet
+$ root@node01 ~ ➜  systemctl status kubelet
+```
+![default](./image/1117-2.PNG)
+정상으로 돌아왔다.
+<br></br>
+(2)
+```
+$ root@node01 ~ ➜  systemctl status kubelet
+```
+
+![default](./image/1117-3.PNG)
+kubelet에 문제가 생긴 듯 하다.
+journalctl을 통해 서비스 로그를 적당히 파악하고 stop하여 로그들을 살펴본다.
+```
+$ root@node01 ~ ➜  journalctl -u kubelet -f
+```
+![default](./image/1117-4.PNG)
+crt파일의 경로가 잘못 되어 있다. kubelet의 config파일을 확인한다. kubelet의 config파일은 /var/lib/kubelet에 있다.
+![default](./image/1117-5.PNG)
+역시나 CA 파일의 경로가 잘못되어 있다. 해당 경로를
+/etc/kubernetes/pki/ca.crt로 바꾸어준다.
+그 후 kubelet을 restart 해준다.
+```
+$ root@node01 ~ ➜  systemctl restart kubelet
+$ root@node01 ~ ➜  systemctl status kubelet
+```
+![default](./image/1117-6.PNG)
+정상으로 돌아왔다.
+<br></br>
+(3)
+![default](./image/1117-7.PNG)
+kubelet이 활성화가 되어있지만 에러코드가 보인다. 
+API Server와 관련된 항목에서 포트가 default값인 6443이 아닌 6553임을 확인할 수 있다. /etc/kubernetes/의 kubelet.conf 파일을 확인해 본다.
+![default](./image/1117-8.PNG)
+역시나 6553으로 되어있다. 6443으로 수정하고 재시작 한다.
+```
+$ root@node01 ~ ➜  systemctl restart kubelet
+$ root@node01 ~ ➜  systemctl status kubelet
+```
+![default](./image/1117-9.PNG)
+문제없이 잘 동작하는 것을 확인할 수 있다.
