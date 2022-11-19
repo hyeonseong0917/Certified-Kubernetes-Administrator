@@ -176,6 +176,7 @@ https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/
 ![default](./image/1119-20.PNG)
 <br></br>
 그런데 해당 yaml파일이 존재하지 않는다. greenbox라는 Pod가 어떤 노드에서 실행중인지 확인한다.
+<br></br>
 ![default](./image/1119-21.PNG)
 <br></br>
 node01에서 실행중인 것을 확인할 수 있다. 해당 노드의 /etc/kubernetes/manifests 디렉토리에 yaml파일이 있는 듯 하다.
@@ -190,18 +191,22 @@ $ ssh node01
 /etc/kubenets/manifests 는 kubelet의 구성 파일에 명시된 default Directory일 뿐이다.
 Kubelet의 config 파일은 /var/lib/kubelet/config.yaml 에 존재한다.
 Control Plane에서의 Kubelet config 파일을 확인해보자.
+<br></br>
 ![default](./image/1119-23.PNG)
 <br></br>
 Static Pod의 Path가 우리가 익히 알고 있는 /etc/kubernetes/manifets로 설정된 것을 확인할 수 있다.
 그럼 node01의 Static Pod Path는 어떻게 구성되어 있을까?
+<br></br>
 ![default](./image/1119-24.PNG)
 <br></br>
 /etc/jut-to-mess-with-you 라는 디렉토리에 저장되어 있다. 해당 디렉토리로 이동하면
 <br></br>
 ![default](./image/1119-25.PNG)
-<br><br>
+<br></br>
 greenbox에 대한 yaml 파일이 존재하는 것을 확인할 수 있다. 해당 파일을 삭제한다.
+<br></br>
 ![default](./image/1119-26.PNG)
 <br></br>
 greenbox Pod가 삭제된 것을 확인할 수 있다.
+
 
