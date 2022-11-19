@@ -55,4 +55,22 @@ webapp-green Pod에서 가장 처음으로 실행되는 command는
 <br></br>
 python app.py --color pink이다.
 
-
+## 3. Env Variables
+1. Pod의 ENV를 configmap에 있는 key: value 값으로 바꾸는 방법
+<br></br>
+kubernetes.io/docs에 configmap 키워드로 검색한다.
+https://kubernetes.io/docs/concepts/configuration/configmap/
+<br></br>
+Pod의 Env에 Configmap이 어떻게 매핑되어 있는지를 확인할 수 있다.
+<br></br>
+![default](./image/1119-8.PNG)
+<br></br>
+valueFrom 밑에 configMapKeyRef를 통해 ConfigMap의 이름을 입력하고, 그 ConfigMap에 있는 key 값을 넣어주면 Pod에 Configmap의 key: value를 매핑할 수 있다.
+다음 Configmap을 보자.
+![default](./image/1119-9.PNG)
+APP_COLOR에 darkblue가 key: value쌍으로 존재하고 있다.
+이를 Pod에 넣어서 활용해 보자.
+<br></br>
+![default](./image/1119-10.PNG)
+<br></br>
+Pod내에서 APP_COLOR라는 환경변수를 webapp-config-map의 Key 값인 APP_COLOR에 해당하는 Value값에 매칭시킬 수 있다. 이 경우는 Value값이 darkblue가 된다.
