@@ -66,3 +66,42 @@ $ kubectl taint nodes controlplane node-role.kubernetes.io/control-plane-
 ```
 
 ## 4. Node Affinity
+1. node01 에 color=blue라는 label을 적용
+kubectl label node <node_name> <key>=<value>
+```
+$ kubectl label node node01 color=blue
+```
+
+2. Name: blue, Replicas: 3, Image: nginx인 deployment가 있을 때, requiredDuringSchedulingIgnoredDuringExecution인 NodeAffinity를 갖게 하고 key: value 값으로 color: blue를 가지도록 수정하는 방법
+kubernetes.io/docs에 NodeAffinity 키워드로 검색한다.
+https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/
+<br></br>
+![default](./image/1119-5.PNG)
+
+Pod의 spec 아래에 affinity 관련 내용을 넣고, matchExpressions 부분에서 key와 value를 color와 blue로 바꾸어준다.
+현재 실행중인 blue deployment를 edit 하여 필요 없는 부분은 삭제하고 해당 내용을 넣는다.
+```
+$ kubectl edit deploy blue
+```
+vi 편집기에서 esc를 누른 후 dd를 누르면 해당 줄이 삭제되며, .을 통해 이전 커맨드를 반복할 수 있다. 혹시 잘못 삭제했다면 u를 눌러 되돌릴 수 있다.
+
+![default](./image/1119-6.PNG)
+![default](./image/1119-7.PNG)
+
+change가 저장된 파일을 kubectl apply 해주면 해당 리소스가 overwrite 되어 정상으로 동작한다.
+
+3. Name: red
+Replicas: 2
+Image: nginx
+NodeAffinity: requiredDuringSchedulingIgnoredDuringExecution
+Key: node-role.kubernetes.io/control-plane
+의 내용을 가지는 deploy를 생성하는 방법.
+<br></br>
+(1) 일단 기본 deploy의 format을 가지는 파일을 생성한다.
+```
+$ k create deploy red --image=nginx --replicas=2 --dry-run=client -o yaml > red.yaml
+```
+(2) NodeAffinity를 적용한다. 앞서 말했듯이 operator에는 크게 Equal과 In, Exists가 있는데 Exists를 사용한다.
+![default](./image/1119-8.PNG)
+
+
