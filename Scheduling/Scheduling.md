@@ -67,7 +67,7 @@ $ kubectl taint nodes controlplane node-role.kubernetes.io/control-plane-
 
 ## 4. Node Affinity
 1. node01 에 color=blue라는 label을 적용
-kubectl label node <node_name> <key>=<value>
+kubectl label node {node_name} {key}={value}
 ```
 $ kubectl label node node01 color=blue
 ```
@@ -99,9 +99,27 @@ Key: node-role.kubernetes.io/control-plane
 <br></br>
 (1) 일단 기본 deploy의 format을 가지는 파일을 생성한다.
 ```
-$ k create deploy red --image=nginx --replicas=2 --dry-run=client -o yaml > red.yaml
+$ kubectl create deploy red --image=nginx --replicas=2 --dry-run=client -o yaml > red.yaml
 ```
 (2) NodeAffinity를 적용한다. 앞서 말했듯이 operator에는 크게 Equal과 In, Exists가 있는데 Exists를 사용한다.
 ![default](./image/1119-8.PNG)
 
+## 5. Resource Limits
+1. rabbit이라는 name의 Pod가 deploy 되어 있다. 해당 Pod에 설정된 CPU Requirements를 구하는 방법
+```
+$ kubectl describe pod rabbit
+```
+![default](./image/1119-9.PNG)
+<br></br>
+Limits은 Pod가 사용하는 자원량을 제한한다. 해당 Pod는 cpu를 2개보다 많이 사용할 수 없다.
+Requests는 실제로 요청하는 자원의 양이므로, 문제에서 원하는 바와 부합한다.
 
+2. 현재 동작중인 elephant Pod가 OOMKilled 상태인데, 이는 Pod가 Limit양을 초과하는 리소스를 소비했기 때문이다. elephant Pod의 Limit을 20Mi로 늘려야 한다.
+kubectl edit을 통해 해당 Section의 Value를 수정해준다.
+
+```
+$ kubectl edit pod elephant
+```
+![default](./image/1119-10.PNG)
+<br></br>
+혹시 overwrite가 되지 않는다면 동작중인 Pod를 삭제하고 다시 만든다.
