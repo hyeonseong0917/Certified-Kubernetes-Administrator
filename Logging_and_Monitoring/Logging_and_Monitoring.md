@@ -31,3 +31,10 @@ lion       1m     18Mi
 ```
 
 ## 2. Managing Application Logs
+1. USER5가 webapp이라는 Pod에 접근하는데 문제가 생겼다. 원인을 찾는 방법?
+```
+$ kubectl logs webapp-1 | grep -i user5
+```
+![default](./image/1119-1.PNG)
+<br></br>
+Many Failed Attempts 때문에 실패한 듯 하다.
