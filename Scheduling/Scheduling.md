@@ -143,3 +143,65 @@ https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/
 ![default](./image/1119-12.PNG)
 ![default](./image/1119-13.PNG)
 daemonset이 배포됐음을 확인할 수 있다.
+
+## 7. Static Pod
+1. 클러스터에 존재하는 모든 namespace의 Static Pod의 개수를 구하는 방법
+Static Pod는 /etc/kubernetes/manifests 디렉토리에서 만들어지므로, 해당 디렉토리로 이동하면
+![default](./image/1119-14.PNG)
+<br></br>
+4개의 Pod 구성 파일들이 있다. 해당 Pod들은 모두 Static Pod이므로 이 클러스터에는 4개의 Static Pod가 존재한다. 
+![default](./image/1119-15.PNG)
+정말로 해당 이름을 가진 Pod들이 존재하는 것을 확인할 수 있다.
+
+2. Name: static-busybox, Image: busybox를 가지며 command로 sleep 1000을 가지는 Static Pod를 생성하는 방법
+<br></br>
+Static Pod는 /etc/kubernetes/manifests에 yaml 파일을 생성하기만 하면 된다. 해당 디렉토리로 이동하여 yaml파일을 구성한다.
+<br></br>
+Static Pod의 기본 format은 kubernetes.io/docs에 Static Pod를 키워드로 검색한다.
+https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/
+<br></br>
+![default](./image/1119-16.PNG)
+<br></br>
+해당 내용을 /etc/kubernetes/manifests/static-busybox.yaml에 붙여넣는다. 그 후 sleep 1000 command를 추가한다.
+![default](./image/1119-18.PNG)
+<br></br>
+![default](./image/1119-17.PNG)
+<br></br>
+해당 yaml 파일을 생성했을 뿐인데 Pod가 생성됐다.
+
+3. static-greenbox라는 Static Pod가 실행중인데, 해당 Pod를 삭제하는 방법
+![default](./image/1119-19.PNG)
+<br></br>
+해당 Pod가 실행중인 것을 확인할 수 있다. /etc/kuberentes/manifest 디렉토리의 yaml 파일이 존재하는지 확인한다.
+![default](./image/1119-20.PNG)
+<br></br>
+그런데 해당 yaml파일이 존재하지 않는다. greenbox라는 Pod가 어떤 노드에서 실행중인지 확인한다.
+![default](./image/1119-21.PNG)
+<br></br>
+node01에서 실행중인 것을 확인할 수 있다. 해당 노드의 /etc/kubernetes/manifests 디렉토리에 yaml파일이 있는 듯 하다.
+ssh를 통해 node01에 접속한다.
+```
+$ ssh node01
+```
+![default](./image/1119-22.PNG)
+<br></br>
+그런데 아무런 파일도 존재하지 않는다. 그 이유는 사실 Static Pod는 /etc/kubernetes/manifests 라는 고정된 디렉토리에서 생성되지 않는 것이 아닌, kubelet 구성 파일의 staticPodPath에 명시된 디렉토리를 기반으로 Static Pod를 생성하고 삭제하는 것이기 때문이다.
+<br></br>
+/etc/kubenets/manifests 는 kubelet의 구성 파일에 명시된 default Directory일 뿐이다.
+Kubelet의 config 파일은 /var/lib/kubelet/config.yaml 에 존재한다.
+Control Plane에서의 Kubelet config 파일을 확인해보자.
+![default](./image/1119-23.PNG)
+<br></br>
+Static Pod의 Path가 우리가 익히 알고 있는 /etc/kubernetes/manifets로 설정된 것을 확인할 수 있다.
+그럼 node01의 Static Pod Path는 어떻게 구성되어 있을까?
+![default](./image/1119-24.PNG)
+<br></br>
+/etc/jut-to-mess-with-you 라는 디렉토리에 저장되어 있다. 해당 디렉토리로 이동하면
+<br></br>
+![default](./image/1119-25.PNG)
+<br><br>
+greenbox에 대한 yaml 파일이 존재하는 것을 확인할 수 있다. 해당 파일을 삭제한다.
+![default](./image/1119-26.PNG)
+<br></br>
+greenbox Pod가 삭제된 것을 확인할 수 있다.
+
