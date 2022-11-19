@@ -123,3 +123,23 @@ $ kubectl edit pod elephant
 ![default](./image/1119-10.PNG)
 <br></br>
 혹시 overwrite가 되지 않는다면 동작중인 Pod를 삭제하고 다시 만든다.
+
+## 6. DaemonSets
+1. Cluster에서 모든 namespace의 Daemonsets개수?
+```
+$ kubectl get daemonsets -A
+```
+2.Name: elasticsearch
+Namespace: kube-system
+Image: k8s.gcr.io/fluentd-elasticsearch:1.20 를 가지는
+FluentD Logging을 위한 Daemonsets를 배포해라.
+
+kubernetes.io/docs에 Daemonset 키워드로 검색한다.
+https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/
+<br></br>
+![default](./image/1119-11.PNG)
+<br></br>
+해당 내용을 복사하고, 문제에서 명시되지 않은 부분은 모두 과감히 삭제한다.
+![default](./image/1119-12.PNG)
+![default](./image/1119-13.PNG)
+daemonset이 배포됐음을 확인할 수 있다.
