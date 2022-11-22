@@ -112,6 +112,34 @@ https://kubernetes.io/docs/concepts/configuration/secret/
 ![default](./image/1122-4.PNG)
 <br></br>
 
+## 5. Multi-Container Pod
+1. Name: yellow, Container 1 Name: lemon, Container 1 Image: busybox, Container 2 Name: gold, Container 2 Image: redis
+의 spec을 가지는 multi-container Pod를 생성하는 방법
+(crashloopbackoff 발생 시 lemon Container에 sleep 1000 command를 추가한다)
 
+kubernetes.io/docs에 multi container 키워드로 검색해 두 개의 컨테이너를 운영하는 Pod를 생성하는 내용을 살펴본다.
+https://kubernetes.io/docs/tasks/access-application-cluster/communicate-containers-same-pod-shared-volume/
+<br></br>
+![default](./image/1122-5.PNG)
+<br></br>
+containers 아래에 여러 개의 이름 및 image를 넣는다.
+<br></br>
+![default](./image/1122-6.PNG)
+<br></br>
 
-
+2. application logging stack을 elastic-stack namespace에서 배포하고 있으며 아키텍처는 다음과 같다.
+<br></br>
+![default](./image/1122-7.PNG)
+<br></br>
+ElasticSearch에 log를 보내기 위해 sidecar container를 구성하려고 한다. Pod를 다음 spec을 가지도록 수정한다.
+Name: app
+Container Name: sidecar
+Container Image: kodekloud/filebeat-configured
+Volume Mount: log-volume
+Mount Path: /var/log/event-simulator/
+Existing Container Name: app
+Existing Container Image: kodekloud/event-simulator
+<br></br>
+![default](./image/1122-8.PNG)
+<br></br>
+container 밑에 동일한 volume을 공유하는 컨테이너를 생성한다. 해당 volume을 volumeMounts를 통해 mount할 수 있다.
