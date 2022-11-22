@@ -74,3 +74,44 @@ APP_COLOR에 darkblue가 key: value쌍으로 존재하고 있다.
 ![default](./image/1119-10.PNG)
 <br></br>
 Pod내에서 APP_COLOR라는 환경변수를 webapp-config-map의 Key 값인 APP_COLOR에 해당하는 Value값에 매칭시킬 수 있다. 이 경우는 Value값이 darkblue가 된다.
+
+## 4. Secrets
+1.  다음 아키텍처에서
+<br></br>
+![default](./image/1122-1.PNG)
+<br></br>
+Secret Name: db-secret, Secret 1: DB_Host=sql01, Secret 2: DB_User=root, Secret 3: DB_Password=password123
+에 해당하는 Secret을 생성하는 방법
+(1) yaml파일을 이용한 방식
+kubernetes.io/docs에 secret 키워드로 검색해 use cases에서 컨테이너 환경 변수로 사용하는 사례를 살펴본다.
+https://kubernetes.io/docs/concepts/configuration/secret/
+<br></br>
+![default](./image/1122-2.PNG)
+<br></br>
+data 부분에 해당하는 타입의 key: value 값을 넣어주면 된다.
+
+(2) 커맨드를 이용한 방식
+<br></br>
+kubectl create secret generic {secret_name} --from-literal={key}={value} 커맨드를 이용한다
+```
+$ kubectl create secret generic db-secret --from-literal=DB_Host=sql01 --from-literal=DB_User=root --from-literal=DB_Password=password123
+```
+create secret 뒤에 generic이 붙어야 하는 것을 주의한다.
+
+2. 기존에 동작중인 webapp-pod가 새로 생성된 db-secret secret으로부터 env를 load할 수 있도록 구성한다.
+<br></br>
+kubernetes.io/docs에 secret 키워드로 검색해 Secret을 컨테이너의 env로 사용하는 내용 중 envFrom을 살펴본다.
+<br></br>
+https://kubernetes.io/docs/concepts/configuration/secret/
+<br></br>
+![default](./image/1122-3.PNG)
+<br></br>
+컨테이너 내에서 envFrom의 secretRef를 통해 참조하고 싶은 secret의 이름을 기입한다.
+기존에 동작중인 Pod에서 작업을 진행해야 하므로, kubectl edit pod를 통해 본 작업과 관련없는 내용을 모두 지우고 필요한 envFrom만을 넣어서 진행한다.
+<br></br>
+![default](./image/1122-4.PNG)
+<br></br>
+
+
+
+
