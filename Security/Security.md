@@ -19,3 +19,12 @@ $ cat /etc/kubernetes/manifests/etcd.yaml
 ![default](./image/1123-2.PNG)
 <br></br>
 /etc/kubernetes/pki/etcd/server.crt임을 확인할 수 있다.
+
+Distributing Self-Signed CA Certificate
+A client node may refuse to recognize a self-signed CA certificate as valid. For a non-production deployment, or for a deployment that runs behind a company firewall, you can distribute a self-signed CA certificate to all clients and refresh the local list for valid certificates.
+
+On each client, perform the following operations:
+```
+$ sudo cp ca.crt /usr/local/share/ca-certificates/kubernetes.crt
+sudo update-ca-certificates
+```
