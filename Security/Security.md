@@ -160,4 +160,77 @@ Deployment의 경우에는 spec밑의 template밑의 spec밑에 명시해야 된
 <br></br>
 default serviceAccountName을 pod에 대한 list 권한이 있는 role을 rolebinding받은 serviceAccount인 dashboard-sa로 바꾸었다. 그 결과 token을 따로 입력하지 않아도 list가 잘 되는 것을 확인할 수 있다.
 
+##6 NetworkPolicy
+1. 다음과 같은 networkpolicy가 있다.
+```
+controlplane ~ ➜ kubectl get networkpolicy
+NAME             POD-SELECTOR   AGE
+payroll-policy   name=payroll   37s
+```
+networkpolicy가 적용되고 있는 Pod가 어떤 Pod인지 확인하는 방법
+<br></br>
+POD-SELECTOR를 기준으로 Pod를 Get한다.
+kubectl get po --selector={key}={name} 의 command를 이용한다.
+```
+controlplane ~ ➜ kubectl get pod --selector=name=payroll
+NAME      READY   STATUS    RESTARTS   AGE
+payroll   1/1     Running   0          96s
+```
+2. networkpolicy에 대한 내용을 살펴본다.
+<br></br>
+![default](./image/1126-9.PNG)
+<br></br> 
+Label이 name=payroll인 Pod에 대해서 해당 policy를 적용한다.
+<br></br>
+PodSelector가 name=internal인 Pod로부터 온 traffic에 대하여, podSelector가 name=payroll인 Pod에 대해서만 ingress traffic을 허용하며, 8080Port로 보낸다는 것을 확인할 수 있다.
+<br></br>
+PodSelector가 name=payroll인 Pod에 대해서 ping test를 진행한다.
+Host Name에는 해당 Pod의 Ip를 넣어주고 Port에는 8080을 넣어준다.
+Internal-service는 Selector를 name=internal을 가지고 있고, external-service는 Selector를 name=external을 가지고 있다.
+internal Pod는 name=internal로 Labeling 되어 있고, external Pod는 name=external로 Labeling되어 있다.
+<br></br>
+![default](./image/1126-10.PNG)
+<br></br> 
+<br></br>
+![default](./image/1126-11.PNG)
+<br></br>
+internal application은 payroll service에 접근할 수 있지만, external applicationd은 timeout되는 것을 확인할 수 있다. 
+<br></br>
+![default](./image/1126-12.PNG)
+<br></br>
+다음과 같은 아키텍처를 가질때, internal Pod에서 external Pod에 영향을 미치고 있는 external-service에 대한 접근이 가능한지 확인한다. external-service의 clusterIP에 접근이 가능한지를 확인하면 된다.
+<br></br>
+![default](./image/1126-13.PNG)
+<br></br>
+<br></br>
+![default](./image/1126-14.PNG)
+<br></br>
+internal->external이 문제없이 잘 동작하는 모습이다.
+3. Internal Pod에 대하여 payroll-service와 db-service에서 오는 traffic만을 허용하는 networkpolicy를 생성하는 방법
+Policy Name: internal-policy
 
+Policy Type: Egress
+
+Egress Allow: payroll
+
+Payroll Port: 8080
+
+Egress Allow: mysql
+
+MySQL Port: 3306
+
+kubernetes.io/docs에 networkpolicy를 키워드로 검색한다.
+https://kubernetes.io/docs/concepts/services-networking/network-policies/
+<br></br>
+![default](./image/1126-15.PNG)
+<br></br>
+docs의 내용과 문제에 제시된 내용을 기반으로 Egress에 대한 내용을 작성한다. Ingress에 대한 제약은 없으므로 Ingress는 {}로 명시한다.
+<br></br>
+![default](./image/1126-16.PNG)
+<br></br>
+PodSelector를 명시해야 하기 때문에 networkpolicy를 적용할 internal Pod의 label이 name=internal인 것을 확인한다.
+<br></br>
+ingress 혹은 egress를 여러 대상에 대해 적용해야 될 떄는 from 혹은 to를 추가로 작성하여 해당 내용을 작성하면 된다.
+<br></br>
+![default](./image/1126-17.PNG)
+<br></br>
