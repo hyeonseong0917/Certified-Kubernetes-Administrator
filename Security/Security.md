@@ -114,4 +114,50 @@ clusterrole.rbac.authorization.k8s.io/storage-admin created
 controlplane ~ ➜ kubectl create clusterrolebinding --clusterrole=storage-admin --user=michelle
 clusterrolebinding.rbac.authorization.k8s.io/michelle-storage-admin created
 ```
-testtest
+## 5. Service Account
+1. default namespace에 dashboard-sa라는 Service Account가 있다. Pod에 대해 list를 허용하는 Role과 RoleBinding을 생성하는 방법
+<br></br>
+(1). Pod에 대해 list를 허용하는 Role을 생성한다.
+```
+controlplane ~ ➜ kubectl create role prob11role --resource=pod --verb=list
+```
+(2). serviceaccount인 dashboard-sa가 해당 role을 가지도록 rolebinding을 생성한다.
+```
+controlplane ~ ➜ kubectl create rolebinding prob11rolebinding --role=prob11role --serviceaccount=default:dashboard-sa
+```
+현재 default namespace에서 dashboard 파드가 실행되고 있다.
+<br></br>
+![default](./image/1126-3.PNG)
+<br></br>
+default serviceaccount를 사용하고 있기 때문에 forbidden 되어 있다. dashboard-sa라는 serviceaccount는 해당 리소스에 대한 행동 권한을 얻었으므로, dashboard-sa로 인증하기 위해 dashboard-sa에 대한 token을 생성한다.
+kubectl create token {serviceaccount_name}
+```
+controlplane ~ ➜ kubectl create token dashboard-sa
+eyJhbGciOiJSUzI1NiIsImtpZCI6IlVEVVFWV3JyYTJKUHZLX0xPSGF2U00zckp3QWJZQjZSMkFRSVdBdUE4MVkifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjLmNsdXN0ZXIubG9jYWwiLCJrM3MiXSwiZXhwIjoxNjY5NDU0Mjg5LCJpYXQiOjE2Njk0NTA2ODksImlzcyI6Imh0dHBzOi8va3ViZXJuZXRlcy5kZWZhdWx0LnN2Yy5jbHVzdGVyLmxvY2FsIiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJkZWZhdWx0Iiwic2VydmljZWFjY291bnQiOnsibmFtZSI6ImRhc2hib2FyZC1zYSIsInVpZCI6IjYxZjQyNWJiLWI1NGMtNGRkYy1iMDI4LTI2NzU4ZTJkYmEwYSJ9fSwibmJmIjoxNjY5NDUwNjg5LCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpkYXNoYm9hcmQtc2EifQ.jlLLiZLZaoI1Kq76DZN8S2Kpws-2uMMhKRlMCXAe0hCr2PcTvIM8iluLryzdU_r3m9LhSP1vzPiWK-h6_6TbkVKX9FhCWAXb8dD-Vl0XWbrb1IuVDzujkRF9WjbdtrqaDq4Mlc6mLHdaP83sfTf3AihL5K6hcwb_eZyUbgUQlzHnZ3YyIqwBSxboChVVNyiZNt1YaWvJXi4IBnGgcO5XnYkJnNwrfdOb5obd3Er-8bQN3fpZbKbTvGMGrzm-qaIHbweOOMy-ztXP8d9090w83ABEvclrPFo3o3NXcNEXa5udwbxeQhsUtpmZ9ItE-B13_Mh6v2q8T7ftlSHAbGLk0A
+```
+해당 토큰을 복사하여 넣어보면,
+<br></br>
+![default](./image/1126-4.PNG)
+<br></br>
+문제없이 잘 실행되는 것을 확인할 수 있다.
+
+2. 현재 위에서 실행한 dashboard서버가 web-dashboard라는 deployment에 있는데, 해당 deployment가 serviceaccount가 default로 설정되어 있어 다른 serviceaccount가 접근을 시도할 때마다 해당 serviceaccount의 토큰을 생성하고, 적용하여야 한다.
+따라서 복잡한 과정를 따르기 보다는 deployment의 기본 serviceaccount를 dashboard-sa로 바꾸는 방법
+<br></br>
+kubernetes.io/docs에 serviceaccount 키워드로 검색하면, Pod에서 어떻게 명시해야 되는지에 대한 예시가 나온다. 비단 service account뿐만이 아닌 PV,Secret,Configmap,PVC등 kubernetes 리소스에 대한 내용을 키워드로 검색하면 Pod에서 어떻게 쓰이는지에 대한 예시가 나온다.
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+<br></br>
+![default](./image/1126-6.PNG)
+<br></br>
+Pod의 spec 바로 밑에 serviceAccountName이라는 내용으로 해당 값을 명시해야 된다는 것을 알 수 있다.
+Deployment의 경우에는 spec밑의 template밑의 spec밑에 명시해야 된다는 점을 주의한다.
+이제 kubectl edit을 통해 serviceaccount내용을 추가한다.
+<br></br>
+![default](./image/1126-5.PNG)
+<br></br>
+<br></br>
+![default](./image/1126-7.PNG)
+<br></br>
+default serviceAccountName을 pod에 대한 list 권한이 있는 role을 rolebinding받은 serviceAccount인 dashboard-sa로 바꾸었다. 그 결과 token을 따로 입력하지 않아도 list가 잘 되는 것을 확인할 수 있다.
+
+
