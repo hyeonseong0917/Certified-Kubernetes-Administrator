@@ -81,3 +81,36 @@ role은 클러스터 전체의 namespace에서 영향력을 발휘하는 Cluster
 ![default](./image/1126-2.PNG)
 <br></br>
 resource에 deployment를 추가한다. 또한 deployment를 api group이 apps인 곳에서 동작하기 때문에 apiGroups에 내용을 추가한다.
+
+## 4. Cluster Roles
+1. 다음과 같은 스펙의 Resource를 생성
+
+ ClusterRole: storage-admin
+
+Resource: persistentvolumes
+
+Resource: storageclasses
+
+ClusterRoleBinding: michelle-storage-admin
+
+ClusterRoleBinding Subject: michelle
+
+ClusterRoleBinding Role: storage-admin
+
+clusterRole은 namespace에 상관없이 영향력을 발휘한다는 점을 인지한다.
+Role 그리고 RoleBinding을 만드는 방법과 크게 다르지 않다.
+ClusterRole의 경우는
+<br></br>
+kubectl create clusterrole <clusterrole_name> --resource={resource to permit} --verb={action to permit}
+--resource와 --verb는 ,를 붙이지 않고 여러 개 쓸 수 있다.
+ClusterRoleBinding의 경우는
+<br></br>
+kubectl create clusterrolebinding <clusterrolebinding_name> --clusterrole={clusterRole to Bound} --user={user to permit}
+의 형태로 작성한다. subject의 경우 user도 될 수 있고 serviceaccount도 될 수 있는데, user가 아닌 serviceaccount의 경우
+--serviceaccount={'namespace name' in serviceaccount}:{serviceaccount name}의 형태로 작성한다.
+```
+controlplane ~ ➜ kubectl create clusterrole storage-admin --resource=persistentvolume --resource=storageclasses --verb=get --verb=list --verb=watch --verb=create --verb=delete
+clusterrole.rbac.authorization.k8s.io/storage-admin created
+controlplane ~ ➜ kubectl create clusterrolebinding --clusterrole=storage-admin --user=michelle
+clusterrolebinding.rbac.authorization.k8s.io/michelle-storage-admin created
+```
