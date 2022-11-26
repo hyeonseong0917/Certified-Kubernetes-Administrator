@@ -42,3 +42,42 @@ $ controlplane ~ ➜ kubectl config --kubeconfig=/root/my-kube-config use-contex
 확인
 <br></br>
 kubectl config --kubeconfig={내 kubeconfig 파일의 위치} current-context
+
+## 3. Role Based Access Control
+1. dev-user라는 user에게 list,create,delete 권한을 할당하는 role과 rolebinding을 만드는 방법
+Role: developer
+
+Role Resources: pods
+
+Role Actions: list
+
+Role Actions: create
+
+Role Actions: delete
+
+RoleBinding: dev-user-binding
+
+RoleBinding: Bound to dev-user
+<br></br>
+role을 생성하기 위해서는
+kubectl create role {role_name} --verb={actions} --verb={actions} --verb={actions} --resource={Resources} -n={namespace} 작업을 거친다.
+<br></br>
+user를 위한 rolebinding을 생성하기 위해서는
+<br></br>
+kubectl create {rolebinding_name} --role={role name to Bound} --user={user name to Bound} -n={namespace_name} 작업을 거친다.
+<br></br>
+ServiceAccount를 위한 rolebinding을 생성하기 위해서는
+<br></br>
+kubectl create {rolebinding_name} --role={role name to Bound} --serviceaccount={serviceaccount's namespace}:{serviceaccount name to Bound} -n={namespace_name} 작업을 거친다    
+
+<br></br>
+![default](./image/1126-1.PNG)
+<br></br>
+
+2. 현재 동작중인 developer role을 기반으로 dev-user에게 blue namespace에서 deployment를 만들 수 있는 권한을 할당하는 rule을 만드는 방법
+(1) role을 수정한다.
+role은 클러스터 전체의 namespace에서 영향력을 발휘하는 ClusterRole과는 달리 각 namespace별로 동작하기 때문에 namespace 명시를 해주어야 한다.
+<br></br>
+![default](./image/1126-2.PNG)
+<br></br>
+resource에 deployment를 추가한다. 또한 deployment를 api group이 apps인 곳에서 동작하기 때문에 apiGroups에 내용을 추가한다.
