@@ -55,3 +55,17 @@ PV docs에 같이 존재한다.
 <br></br>
 ![default](./image/1127-6.PNG)
 <br></br>
+5. PVC가 Bounding되지 않은 이유
+<br></br>
+![default](./image/1128-1.PNG)
+<br></br>
+PV와 PVC의 Access Mode가 일치하지 않는다.
+6. webapp Pod의 volume을 hostPath에서 새로 생성한 PVC로 바꾸는 방법
+<br></br>
+![default](./image/1128-2.PNG)
+<br></br>
+해당 docs 문서에 Pod에서 PVC를 어떻게 선언하고 활용하는지에 대한 내용이 있다. hostPath와 유사하게 volume 이름을 선언하고, PersistentVolumeClaim을 설정한 다음 claimName을 기입하면 된다.
+<br></br>
+![default](./image/1128-3.PNG)
+<br></br>
+PVC를 Pod내에서 선택했고, 그 PVC를 Volume으로 선언하였고, 그 Volume을 Container 내에서 volumeMount하여 해당 Volume과 mountPath가 연동되도록 구성했다.
