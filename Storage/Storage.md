@@ -18,3 +18,22 @@ hostPath의 configuration은 다음과 같다. volumes 밑에 hostpath를 선언
 <br></br>
 ![default](./image/1127-2.PNG)
 <br></br>
+
+3. 다음 spec을 가지는 Persistent Volume 생성한다.
+<br></br>
+Volume Name: pv-log
+<br></br>
+Storage: 100Mi
+<br></br>
+Access Modes: ReadWriteMany
+<br></br>
+Host Path: /pv/log
+<br></br>
+Reclaim Policy: Retain
+<br></br>
+kubernetes.io/docs에 Persistent Volume 키워드로 검색한다.
+https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+<br></br>
+![default](./image/1127-3.PNG)
+<br></br>
+이 경우는 nfs대신 hostPath를 넣어 작성한다.
