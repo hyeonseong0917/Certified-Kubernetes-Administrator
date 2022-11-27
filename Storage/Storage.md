@@ -37,3 +37,21 @@ https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 ![default](./image/1127-3.PNG)
 <br></br>
 이 경우는 nfs대신 hostPath를 넣어 작성한다.
+<br></br>
+![default](./image/1127-4.PNG)
+<br></br>
+4. Persistent Volume Claim를 해당 spec에 맞게 생성한다.
+Volume Name: claim-log-1
+<br></br>
+Storage Request: 50Mi
+<br></br>
+Access Modes: ReadWriteOnce
+<br></br>
+PV docs에 같이 존재한다.
+<br></br>
+![default](./image/1127-5.PNG)
+<br></br>
+마찬가지로 해당하는 내용들을 기입한다.
+<br></br>
+![default](./image/1127-6.PNG)
+<br></br>
